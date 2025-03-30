@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Questions for {{ quiz.title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h4>Questions for "{{ quiz.title }}"</h4>
+            <a href="{{ url_for('admin.add_question', quiz_id=quiz.id) }}" class="btn btn-light">
+                <i class="fas fa-plus"></i> Add Question
+            </a>
+        </div>
+        <div class="card-body">
+            {% if questions %}
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Question Text</th>
+                        <th>Options</th>
+                        <th>Correct Option</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for question in questions %}
+                    <tr>
+                        <td>{{ question.question_text }}</td>
+                        <td>
+                            A: {{ question.option1 }}<br>
+                            B: {{ question.option2 }}<br>
+                            C: {{ question.option3 }}<br>
+                            D: {{ question.option4 }}
+                        </td>
+                        <td>{{ question.correct_option }}</td>
+                        <td>
+                            <a href="{{ url_for('admin.edit_question', id=question.id) }}" class="btn btn-sm btn-warning">
+                                Edit
+                            </a>
+                            <a href="{{ url_for('admin.delete_question', id=question.id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this question?')">
+                                Delete
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="alert alert-info">
+                No questions have been added to this quiz yet.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Quiz - Admin - Quiz Master{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4>Add New Quiz to {{ chapter.name }}</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('admin.add_quiz', chapter_id=chapter.id) }}">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Quiz Title</label>
+                        <input type="text" class="form-control" id="title" name="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="date_of_quiz" class="form-label">Quiz Date</label>
+                        <input type="date" class="form-control" id="date_of_quiz" name="date_of_quiz" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="time_duration" class="form-label">Duration (minutes)</label>
+                        <input type="number" class="form-control" id="time_duration" name="time_duration" min="1" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="remarks" class="form-label">Remarks</label>
+                        <textarea class="form-control" id="remarks" name="remarks" rows="3"></textarea>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('admin.quizzes', chapter_id=chapter.id) }}" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary">Save Quiz</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

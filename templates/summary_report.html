@@ -1,0 +1,394 @@
+{% extends 'base.html' %}
+
+{% block title %}Summary Report{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Summary Report</h2>
+        <div class="btn-group">
+            <a href="{{ url_for('common.summary_report', period='all') }}" class="btn btn-outline-primary {% if period == 'all' %}active{% endif %}">All Time</a>
+            <a href="{{ url_for('common.summary_report', period='year') }}" class="btn btn-outline-primary {% if period == 'year' %}active{% endif %}">Last Year</a>
+            <a href="{{ url_for('common.summary_report', period='month') }}" class="btn btn-outline-primary {% if period == 'month' %}active{% endif %}">Last Month</a>
+            <a href="{{ url_for('common.summary_report', period='week') }}" class="btn btn-outline-primary {% if period == 'week' %}active{% endif %}">Last Week</a>
+        </div>
+    </div>
+    
+    {% if is_admin %}
+    <!-- ADMIN VIEW -->
+    
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card text-center bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Users</h5>
+                    <h2 class="display-4">{{ total_users }}</h2>
+                    <p class="card-text">New: {{ new_users }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card text-center bg-success text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Quizzes</h5>
+                    <h2 class="display-4">{{ total_quizzes }}</h2>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card text-center bg-info text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Quiz Attempts</h5>
+                    <h2 class="display-4">{{ total_attempts }}</h2>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card text-center bg-warning">
+                <div class="card-body">
+                    <h5 class="card-title">Average Score</h5>
+                    <h2 class="display-4">{{ avg_score|round(1) }}%</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- Most Popular Quizzes -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Most Popular Quizzes</h5>
+                </div>
+                <div class="card-body">
+                    {% if popular_quizzes %}
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Quiz</th>
+                                <th>Attempts</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for quiz, count in popular_quizzes %}
+                            <tr>
+                                <td>{{ quiz.title }}</td>
+                                <td>{{ count }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <div class="alert alert-info">No quiz attempts recorded.</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Best Performing Subjects -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Best Performing Subjects</h5>
+                </div>
+                <div class="card-body">
+                    {% if best_subjects %}
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Subject</th>
+                                <th>Average Score</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for subject, score in best_subjects %}
+                            <tr>
+                                <td>{{ subject }}</td>
+                                <td>{{ score|round(1) }}%</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <div class="alert alert-info">No subject performance data available.</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Top Performing Users -->
+    <div class="row">
+        <div class="col-md-12 mb-4">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Top Performing Users</h5>
+                </div>
+                <div class="card-body">
+                    {% if top_users %}
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Average Score</th>
+                                <th>Quizzes Taken</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for username, avg_score, quiz_count in top_users %}
+                            <tr>
+                                <td>{{ username }}</td>
+                                <td>{{ avg_score|round(1) }}%</td>
+                                <td>{{ quiz_count }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <div class="alert alert-info">No user performance data available.</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {% else %}
+    <!-- USER VIEW -->
+    
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-4 mb-3">
+            <div class="card text-center bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Quizzes Taken</h5>
+                    <h2 class="display-4">{{ total_attempts }}</h2>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-3">
+            <div class="card text-center bg-success text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Average Score</h5>
+                    <h2 class="display-4">{{ avg_score|round(1) }}%</h2>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-3">
+            <div class="card text-center bg-info text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Subjects Studied</h5>
+                    <h2 class="display-4">{{ user_subjects|length }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- Your Subjects -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Your Subjects</h5>
+                </div>
+                <div class="card-body">
+                    {% if user_subjects %}
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Subject</th>
+                                <th>Quizzes Taken</th>
+                                <th>Avg. Score</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for subject, count, score in user_subjects %}
+                            <tr>
+                                <td>{{ subject }}</td>
+                                <td>{{ count }}</td>
+                                <td>{{ score|round(1) }}%</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <div class="alert alert-info">You haven't taken any quizzes yet.</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Best Performing Subjects -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Your Best Subjects</h5>
+                </div>
+                <div class="card-body">
+                    {% if best_subjects %}
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Subject</th>
+                                <th>Average Score</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for subject, score in best_subjects %}
+                            <tr>
+                                <td>{{ subject }}</td>
+                                <td>{{ score|round(1) }}%</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <div class="alert alert-info">No subject performance data available.</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Activity -->
+    <div class="row">
+        <div class="col-md-12 mb-4">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Recent Activity</h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_activity %}
+                    <div class="list-group">
+                        {% for score in recent_activity %}
+                        <a href="{{ url_for('user.quiz_result', score_id=score.id) }}" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1">{{ score.quiz.title }}</h5>
+                                <small>{{ score.timestamp.strftime('%b %d, %Y') }}</small>
+                            </div>
+                            <p class="mb-1">Score: {{ score.score }}%</p>
+                            <small>{{ score.quiz.chapter.subject.name }}</small>
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">You haven't taken any quizzes yet.</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Performance Chart (for both user and admin views) -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">
+                        {% if is_admin %}
+                        Subject Performance
+                        {% else %}
+                        Your Score Trends
+                        {% endif %}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="performanceChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Performance Chart
+    var ctx = document.getElementById('performanceChart').getContext('2d');
+    
+    {% if is_admin %}
+    // Admin view - Subject performance
+    var labels = [
+        {% for subject, score in best_subjects %}
+            "{{ subject }}",
+        {% endfor %}
+    ];
+    
+    var data = [
+        {% for subject, score in best_subjects %}
+            {{ score }},
+        {% endfor %}
+    ];
+    
+    var chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Average Score (%)',
+                data: data,
+                backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100
+                }
+            }
+        }
+    });
+    {% else %}
+    // User view - Score trends over time
+    var labels = [
+        {% for month, score in score_trend %}
+            {% if month is string %}
+                {{ month }}  <!-- Already formatted as YYYY-MM -->
+            {% else %}
+                {{ month.strftime('%B %Y') }}  <!-- For datetime objects -->
+            {% endif %}
+        {% endfor %}
+    ];
+    
+    var data = [
+        {% for month, score in score_trend %}
+            {{ score }},
+        {% endfor %}
+    ];
+    
+    var chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Average Score (%)',
+                data: data,
+                fill: false,
+                borderColor: 'rgba(54, 162, 235, 1)',
+                tension: 0.1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100
+                }
+            }
+        }
+    });
+    {% endif %}
+});
+</script>
+{% endblock %}
+
+{% endblock %}

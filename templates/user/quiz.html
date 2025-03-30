@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+
+{% block title %}Take Quiz - {{ quiz.title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4>{{ quiz.title }}</h4>
+                    <p class="mb-0">{{ quiz.chapter.subject.name }}</p>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-4">
+                        <div>
+                            <p><strong>Duration:</strong> {{ quiz.time_duration }} minutes</p>
+                            <p><strong>Total Questions:</strong> {{ questions|length }}</p>
+                        </div>
+                        <div>
+                            <div id="timer" class="alert alert-warning text-center p-2">
+                                <strong>Time Remaining: <span id="time-display">{{ quiz.time_duration }}:00</span></strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form id="quiz-form" method="POST">
+                        
+                        {% for question in questions %}
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5>Question {{ loop.index }}</h5>
+                            </div>
+                            <div class="card-body">
+                                <p class="fw-bold">{{ question.question_text }}</p>
+                                
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="radio" name="answer_{{ question.id }}" id="option_a_{{ question.id }}" value="A" required>
+                                    <label class="form-check-label" for="option_a_{{ question.id }}">
+                                        A: {{ question.option1 }}
+                                    </label>
+                                </div>
+                                
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="radio" name="answer_{{ question.id }}" id="option_b_{{ question.id }}" value="B">
+                                    <label class="form-check-label" for="option_b_{{ question.id }}">
+                                        B: {{ question.option2 }}
+                                    </label>
+                                </div>
+                                
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="radio" name="answer_{{ question.id }}" id="option_c_{{ question.id }}" value="C">
+                                    <label class="form-check-label" for="option_c_{{ question.id }}">
+                                        C: {{ question.option3 }}
+                                    </label>
+                                </div>
+                                
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="radio" name="answer_{{ question.id }}" id="option_d_{{ question.id }}" value="D">
+                                    <label class="form-check-label" for="option_d_{{ question.id }}">
+                                        D: {{ question.option4 }}
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary btn-lg">Submit Quiz</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Timer functionality
+        var duration = {{ quiz.duration }};
+        var totalSeconds = duration * 60;
+        var timer = document.getElementById('time-display');
+        
+        var countdown = setInterval(function() {
+            totalSeconds--;
+            
+            var minutes = Math.floor(totalSeconds / 60);
+            var seconds = totalSeconds % 60;
+            
+            timer.textContent = minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
+            
+            if (totalSeconds <= 0) {
+                clearInterval(countdown);
+                alert('Time is up! Your quiz will be submitted automatically.');
+                document.getElementById('quiz-form').submit();
+            }
+        }, 1000);
+        
+        // Save form state in local storage as user answers questions
+        var form = document.getElementById('quiz-form');
+        var radios = form.querySelectorAll('input[type="radio"]');
+        
+        // Load any saved answers
+        var quizId = {{ quiz.id }};
+        var savedAnswers = JSON.parse(localStorage.getItem('quiz_' + quizId) || '{}');
+        
+        for (var questionId in savedAnswers) {
+            var selector = 'input[name="answer_' + questionId + '"][value="' + savedAnswers[questionId] + '"]';
+            var radio = document.querySelector(selector);
+            if (radio) {
+                radio.checked = true;
+            }
+        }
+        
+        // Save answers as they're selected
+        radios.forEach(function(radio) {
+            radio.addEventListener('change', function() {
+                var answers = JSON.parse(localStorage.getItem('quiz_' + quizId) || '{}');
+                var questionId = this.name.split('_')[1];
+                answers[questionId] = this.value;
+                localStorage.setItem('quiz_' + quizId, JSON.stringify(answers));
+            });
+        });
+        
+        // Clear localStorage when form is submitted
+        form.addEventListener('submit', function() {
+            localStorage.removeItem('quiz_' + quizId);
+        });
+    });
+</script>
+{% endblock %}

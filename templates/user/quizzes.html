@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">{{ chapter.name }} - Quizzes</h1>
+    
+    <div class="row">
+        {% if quizzes %}
+            {% for quiz in quizzes %}
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ quiz.name }}</h5>
+                            <p class="card-text">
+                                Duration: {{ quiz.time_duration }} minutes<br>
+                                Questions: {{ quiz.questions|length }}
+                            </p>
+                            
+                            {% set previous_attempt = quiz_attempts.get(quiz.id) %}
+                            {% if previous_attempt %}
+                                <div class="alert alert-info">
+                                    Previous Attempt: {{ "%.2f"|format(previous_attempt.score) }}%<br>
+                                    Attempted on: {{ previous_attempt.timestamp.strftime('%Y-%m-%d %H:%M') }}
+                                </div>
+                                <a href="{{ url_for('user.start_quiz', quiz_id=quiz.id) }}" 
+                                   class="btn btn-primary">
+                                    Retake Quiz
+                                </a>
+                            {% else %}
+                                <a href="{{ url_for('user.start_quiz', quiz_id=quiz.id) }}" 
+                                   class="btn btn-success">
+                                    Start Quiz
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="alert alert-info">
+                    No quizzes available for this chapter.
+                </div>
+            </div>
+        {% endif %}
+    </div>
+    
+    <div class="mt-3">
+        <a href="{{ url_for('user.subjects') }}" class="btn btn-secondary">
+            Back to Subjects
+        </a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+
+{% block title %}User Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Welcome, {{ current_user.full_name }}!</h2>
+            <p class="lead">Explore subjects and take quizzes to improve your knowledge.</p>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4>Your Quiz Statistics</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h1 class="display-4">{{ total_quizzes_taken }}</h1>
+                                    <p class="card-text">Quizzes Taken</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h1 class="display-4">{{ avg_scores|round(1) }}%</h1>
+                                    <p class="card-text">Average Score</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mt-3">
+                        <a href="{{ url_for('user.subjects') }}" class="btn btn-primary">Browse Subjects</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h4>Recent Quiz Attempts</h4>
+                </div>
+                <div class="card-body">
+                    {% if recent_scores %}
+                    <div class="list-group">
+                        {% for score in recent_scores %}
+                        <a href="{{ url_for('user.quiz_result', score_id=score.id) }}" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1">{{ score.quiz.title }}</h5>
+                                <small>{{ score.timestamp.strftime('%b %d, %Y') }}</small>
+                            </div>
+                            <p class="mb-1">Score: {{ score.score }}%</p>
+                            <small>{{ score.quiz.chapter.subject.name }}</small>
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> You haven't taken any quizzes yet. Start exploring subjects and take quizzes to improve your knowledge!
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {% if performance_data %}
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h4>Performance by Subject</h4>
+                </div>
+                <div class="card-body">
+                    <canvas id="performanceChart" height="250"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var ctx = document.getElementById('performanceChart').getContext('2d');
+            var chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: {{ performance_data.subjects|tojson }},
+                    datasets: [{
+                        label: 'Average Score (%)',
+                        data: {{ performance_data.scores|tojson }},
+                        backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+    {% endif %}
+</div>
+{% endblock %}

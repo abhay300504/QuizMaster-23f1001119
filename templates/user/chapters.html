@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">{{ subject.name }} - Chapters</h1>
+    
+    <div class="row">
+        {% if chapters %}
+            {% for chapter in chapters %}
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ chapter.name }}</h5>
+                            <p class="card-text">{{ chapter.description or 'No description available' }}</p>
+                            <a href="{{ url_for('user.quizzes', chapter_id=chapter.id) }}" 
+                               class="btn btn-primary">
+                                View Quizzes
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="alert alert-info">
+                    No chapters available for this subject.
+                </div>
+            </div>
+        {% endif %}
+    </div>
+    
+    <div class="mt-3">
+        <a href="{{ url_for('user.subjects') }}" class="btn btn-secondary">
+            Back to Subjects
+        </a>
+    </div>
+</div>
+{% endblock %}

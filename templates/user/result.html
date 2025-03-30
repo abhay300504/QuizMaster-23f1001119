@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Quiz Result</h3>
+                </div>
+                <div class="card-body">
+                    <h4>{{ quiz.name }}</h4>
+                    
+                    <div class="alert {% if score.score >= 70 %}alert-success{% else %}alert-warning{% endif %}">
+                        <h5>Your Score: {{ score.score }}%</h5>
+                        <p>
+                            Correct Answers: {{ score.correct_answers }} / {{ score.total_questions }}
+                        </p>
+                    </div>
+                    
+                    <div class="text-center mt-4">
+                        <a href="{{ url_for('user.dashboard') }}" class="btn btn-primary mr-2">
+                            Back to Dashboard
+                        </a>
+                        <a href="{{ url_for('user.chapters', subject_id=quiz.chapter_id) }}" class="btn btn-secondary">
+                            More Quizzes
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

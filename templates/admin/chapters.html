@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Chapters - Admin - Quiz Master{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Chapters for {{ subject.name }}</h2>
+    <a href="{{ url_for('admin.add_chapter', subject_id=subject.id) }}" class="btn btn-primary">Add New Chapter</a>
+</div>
+
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('admin.subjects') }}">Subjects</a></li>
+        <li class="breadcrumb-item active">{{ subject.name }} Chapters</li>
+    </ol>
+</nav>
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for chapter in chapters %}
+                    <tr>
+                        <td>{{ chapter.id }}</td>
+                        <td>{{ chapter.name }}</td>
+                        <td>{{ chapter.description }}</td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a href="{{ url_for('admin.quizzes', chapter_id=chapter.id) }}" class="btn btn-sm btn-info">Quizzes</a>
+                                <a href="{{ url_for('admin.edit_chapter', id=chapter.id) }}" class="btn btn-sm btn-warning">Edit</a>
+                                <a href="{{ url_for('admin.delete_chapter', id=chapter.id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this chapter?');">Delete</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4" class="text-center">No chapters found. <a href="{{ url_for('admin.add_chapter', subject_id=subject.id) }}">Add one</a>.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
