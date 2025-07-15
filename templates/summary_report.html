@@ -299,7 +299,7 @@
                     </h5>
                 </div>
                 <div class="card-body">
-                    <canvas id="performanceChart" height="300"></canvas>
+                    <canvas id="performanceChart" height="100"></canvas>
                 </div>
             </div>
         </div>
@@ -350,17 +350,13 @@ document.addEventListener('DOMContentLoaded', function() {
     {% else %}
     // User view - Score trends over time
     var labels = [
-        {% for month, score in score_trend %}
-            {% if month is string %}
-                {{ month }}  <!-- Already formatted as YYYY-MM -->
-            {% else %}
-                {{ month.strftime('%B %Y') }}  <!-- For datetime objects -->
-            {% endif %}
+        {% for subject, score in best_subjects %}
+            "{{ subject }}",
         {% endfor %}
     ];
     
     var data = [
-        {% for month, score in score_trend %}
+        {% for subject, score in best_subjects %}
             {{ score }},
         {% endfor %}
     ];
